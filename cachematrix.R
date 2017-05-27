@@ -1,38 +1,41 @@
-## create a special matrix that can store its Inverse
-## usage:
-## 1. create a normal matrix: myMatBig <- matrix(rnorm(1000000),1000,1000)
-## 2. create cacheMatrix object: cacheM <- makeCacheMatrix(myMatBig)
-## 3. calculte the inverse: cacheSolve(cacheM)
-## The first time, the inverse is calculated and returned
-## The next time the function is called, it will return the inverse matrix from the cache
-
-## Create a cacheMatrix from a normal matrix
+# create a matrix that can hold a cache value
 makeCacheMatrix <- function(x = matrix()) {
   m <- NULL
-  ## set clears the cache and assigns the matrix to x
+  # set data, clear cache
   set <- function(y) {
     x <<- y
     m <<- NULL
   }
-  get <- function() x
-  setSolve <- function(Solve) m <<- Solve
-  getSolve<- function() m
+  # return data (not the chached value)
+  get <- function() {
+    x
+  }
+  setSolveCache <- function(solveResult) {
+    m <<- solveResult
+  }
+  getSolveCache <- function() {
+    m
+  }
   list(set = set, get = get,
-       setSolve = setSolve,
-       getSolve = getSolve)
+       setSolveCache = setSolveCache ,
+       getSolveCache = getSolveCache )
 }
 
-## Return the inverse of a cacheMatrix, from cache if available
+# Return the inverse of a matrix created with makeCacheMatrix. 
+# If the inverse has been calculated before it will return the cached value
 cacheSolve <- function(x, ...) {
-  m <- x$getSolve()
-  ## check if the cache exists
+  # get the cached value
+  m <- x$getSolveCache()
+  # check if the cached value exists
   if(!is.null(m)) {
     message("getting cached data")
     return(m)
   }
+  # retrieve data stored in the matrix
   data <- x$get()
-  ## if the cache is empty, calculate the inverse, store it in the cache and return it
+  # calculate inverse, store it in cache
   m <- solve(data, ...)
-  x$setSolve(m)
+  x$setSolveCache(m)
+  # return inverse
   m
 }
